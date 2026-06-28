@@ -11,6 +11,8 @@ use App\Models\Plan;
 use App\Models\Review;
 use App\Models\Skill;
 use App\Models\User;
+use App\Models\Conversation;
+use App\Models\Message;
 use App\Notifications\ExchangeAcceptedNotification;
 use App\Notifications\ExchangeCompletedNotification;
 use Illuminate\Database\Eloquent\Builder;
@@ -456,8 +458,34 @@ class SkillExchangeController extends Controller
 
             if ($action === 'accept') {
                 $exchangeRequest->update(['status' => 'accepted']);
+                
+                // Buat conversation jika belum ada
+                $conversation = Conversation::firstOrCreate(
+                    [
+                        'user1_id' => min($exchangeRequest->from_user_id, $exchangeRequest->to_user_id),
+                        'user2_id' => max($exchangeRequest->from_user_id, $exchangeRequest->to_user_id),
+                    ],
+                    [
+                        'exchange_request_id' => $exchangeRequest->id,
+                        'last_message_at' => now(),
+                    ]
+                );
+                
+                // Kirim pesan otomatis
+                Message::create([
+                    'conversation_id' => $conversation->id,
+                    'sender_id' => $user->id,
+                    'content' => 'Halo! Exchange request kita sudah diterima. Yuk mulai berkomunikasi untuk koordinasi exchange!',
+                    'is_read' => false,
+                    'type' => 'text',
+                    'metadata' => null,
+                ]);
+                
                 // Send notification to from_user
                 $exchangeRequest->fromUser->notify(new ExchangeAcceptedNotification($exchangeRequest));
+                
+                // Redirect ke chat
+                return redirect()->route('chat.show', $conversation)->with('status', 'Exchange request berhasil diterima. Yuk mulai chat!');
             } else {
                 $exchangeRequest->update(['status' => 'rejected']);
             }

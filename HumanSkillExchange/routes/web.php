@@ -77,4 +77,17 @@ Route::middleware([
 
     // Review after exchange completed
     Route::post('/exchange-requests/{exchangeRequest}/review', [SkillExchangeController::class, 'storeReview'])->name('exchange-requests.review.store');
+
+    // Chat
+    Route::get('/chat', [App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{conversation}', [App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{conversation}/messages', [App\Http\Controllers\ChatController::class, 'store'])->name('chat.messages.store');
+    Route::get('/chat/with/{user}', [App\Http\Controllers\ChatController::class, 'createWithUser'])->name('chat.with');
+    Route::post('/chat/{conversation}/progress', [App\Http\Controllers\ChatController::class, 'storeProgress'])->name('chat.progress.store');
+    Route::post('/chat/{conversation}/exchange-action', [App\Http\Controllers\ChatController::class, 'exchangeAction'])->name('chat.exchange.action');
+
+    // Mentoring Sessions
+    Route::get('/mentoring/session/{booking}', [App\Http\Controllers\MentoringSessionController::class, 'show'])->name('mentoring.session.show');
+    Route::post('/mentoring/session/{booking}/status', [App\Http\Controllers\MentoringSessionController::class, 'updateStatus'])->name('mentoring.session.update-status');
+    Route::post('/mentoring/room/{room}/update', [App\Http\Controllers\MentoringSessionController::class, 'updateRoom'])->name('mentoring.room.update');
 });

@@ -45,6 +45,10 @@
         @apply bg-white;
     }
 
+    .nb-btn-secondary {
+        @apply bg-brand-purple text-white;
+    }
+
     /* Inputs */
     .nb-input {
         @apply w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm font-medium text-ink shadow-nb-sm transition-shadow placeholder:text-slate-400 focus:shadow-nb focus:outline-none;

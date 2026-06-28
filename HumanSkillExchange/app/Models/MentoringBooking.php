@@ -17,6 +17,7 @@ class MentoringBooking extends Model
         'duration_minutes',
         'price',
         'notes',
+        'session_status',
     ];
 
     protected $casts = [

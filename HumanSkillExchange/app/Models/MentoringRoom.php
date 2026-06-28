@@ -17,6 +17,8 @@ class MentoringRoom extends Model
         'duration_minutes',
         'price',
         'status',
+        'video_link',
+        'meeting_notes',
     ];
 
     protected $casts = [
@@ -26,5 +28,10 @@ class MentoringRoom extends Model
     public function mentor()
     {
         return $this->belongsTo(User::class, 'mentor_id');
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(MentoringBooking::class);
     }
 }

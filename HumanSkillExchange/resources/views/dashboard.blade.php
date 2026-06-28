@@ -74,27 +74,34 @@
                                 <h2 class="text-base font-semibold text-ink font-black">Booking untuk saya (sebagai mentor)</h2>
                                 <p class="mt-1 text-sm text-ink/70 font-semibold">Kelola booking yang masuk untuk mentoring Anda.</p>
                             </div>
-                            <div class="divide-y divide-slate-100 bg-paper p-6">
+                            <div class="divide-y-2 divide-ink/10 bg-paper p-6">
                                 @foreach ($mentorBookings as $mb)
-                                    <article class="p-4 rounded-lg bg-white mb-4 last:mb-0 border border-ink/10">
+                                    <article class="p-4 rounded-xl bg-white mb-4 last:mb-0 border-2 border-ink shadow-nb-sm">
                                         <div class="flex items-start justify-between">
                                             <div>
                                                 <p class="font-semibold text-ink font-black">{{ $mb->user?->name }} — {{ $mb->room?->title }}</p>
                                                 <p class="mt-1 text-sm text-ink/60 font-semibold">Jadwal: {{ optional($mb->scheduled_at)->format('Y-m-d H:i') }} · Durasi: {{ $mb->duration_minutes ?? '—' }} menit</p>
                                                 <p class="mt-2 text-xs text-ink/60 font-semibold">Catatan: {{ $mb->notes ?? 'Tidak ada' }}</p>
                                             </div>
-                                            <div class="flex gap-2">
-                                                @if ($mb->status === 'pending')
-                                                    <form method="POST" action="{{ route('mentoring-bookings.mentor.approve', $mb) }}">
-                                                        @csrf
-                                                        <button type="submit" class="rounded-md bg-brand-lime border-2 border-ink px-3 py-2 text-xs font-semibold text-ink">Approve</button>
-                                                    </form>
-                                                    <form method="POST" action="{{ route('mentoring-bookings.mentor.decline', $mb) }}">
-                                                        @csrf
-                                                        <button type="submit" class="rounded-md border-2 border-ink bg-brand-pink px-3 py-2 text-xs font-semibold text-ink">Decline</button>
-                                                    </form>
-                                                @else
-                                                    <span class="rounded-md border-2 border-ink bg-paper px-3 py-2 text-xs font-semibold">{{ $mb->status }}</span>
+                                            <div class="flex flex-col gap-2 items-end">
+                                                <div class="flex gap-2">
+                                                    @if ($mb->status === 'pending')
+                                                        <form method="POST" action="{{ route('mentoring-bookings.mentor.approve', $mb) }}">
+                                                            @csrf
+                                                            <button type="submit" class="nb-btn nb-btn-yellow text-xs">Approve</button>
+                                                        </form>
+                                                        <form method="POST" action="{{ route('mentoring-bookings.mentor.decline', $mb) }}">
+                                                            @csrf
+                                                            <button type="submit" class="nb-btn nb-btn-pink text-xs">Decline</button>
+                                                        </form>
+                                                    @else
+                                                        <span class="nb-badge bg-paper">{{ $mb->status }}</span>
+                                                    @endif
+                                                </div>
+                                                @if ($mb->status === 'approved')
+                                                    <a href="{{ route('mentoring.session.show', $mb) }}" class="nb-btn nb-btn-primary text-xs px-3 py-1">
+                                                        <i class="fas fa-chalkboard mr-1"></i>Kelola Kelas
+                                                    </a>
                                                 @endif
                                             </div>
                                         </div>
@@ -368,10 +375,10 @@
 
                         <div class="mt-4 grid gap-4">
                             @forelse ($mentoringRooms as $room)
-                                <div class="rounded-md border p-4">
+                                <div class="rounded-xl border-2 border-ink bg-white p-4 shadow-nb-sm">
                                     <div class="flex items-start justify-between">
                                         <div>
-                                            <p class="font-semibold">{{ $room->title }}</p>
+                                            <p class="font-black text-ink">{{ $room->title }}</p>
                                             <p class="mt-1 text-sm text-ink/60 font-semibold">{{ $room->description }}</p>
                                             <p class="mt-2 text-xs text-ink/60 font-semibold">Mentor: {{ $room->mentor?->name ?? 'n/a' }}</p>
                                         </div>
@@ -381,7 +388,7 @@
                                                 <input type="hidden" name="mentoring_room_id" value="{{ $room->id }}">
                                                 <input name="scheduled_at" type="datetime-local" required class="nb-input w-full">
                                                 <input name="duration_minutes" type="number" min="15" placeholder="Durasi (menit)" class="nb-input w-full">
-                                                <button type="submit" class="w-full rounded-md bg-teal-600 px-3 py-2 text-xs font-semibold text-white hover:bg-teal-700">Pesan</button>
+                                                <button type="submit" class="nb-btn nb-btn-primary w-full text-xs">Pesan</button>
                                             </form>
                                         </div>
                                     </div>
@@ -394,23 +401,23 @@
 
                     {{-- Booking saya --}}
                     @if ($viewer->mentoringBookings->count())
-                        <section class="nb-card">
-                            <div class="border-b border-ink px-5 py-4">
+                        <section class="nb-card overflow-hidden">
+                            <div class="border-b-2 border-ink bg-brand-sky px-5 py-4">
                                 <h2 class="text-base font-semibold text-ink font-black">Booking mentoring saya</h2>
                                 <p class="mt-1 text-xs text-ink/60 font-semibold">Sesi mentoring yang sudah kamu pesan.</p>
                             </div>
-                            <div class="divide-y divide-slate-100">
+                            <div class="divide-y-2 divide-ink/10 bg-white">
                                 @foreach ($viewer->mentoringBookings->sortByDesc('created_at') as $booking)
                                     @php
                                         $bStatusTone = [
-                                            'pending'  => 'bg-brand-yellow text-ink',
-                                            'approved' => 'bg-brand-lime text-ink',
-                                            'declined' => 'bg-rose-100 text-rose-700',
+                                            'pending'  => 'bg-brand-yellow',
+                                            'approved' => 'bg-brand-lime',
+                                            'declined' => 'bg-brand-pink',
                                         ];
                                     @endphp
                                     <article class="p-5">
                                         <div class="flex items-start justify-between gap-3">
-                                            <div>
+                                            <div class="flex-1">
                                                 <p class="font-semibold text-ink font-black">{{ $booking->room?->title ?? 'Sesi Mentoring' }}</p>
                                                 <p class="mt-1 text-xs text-ink/60 font-semibold">
                                                     Mentor: {{ $booking->room?->mentor?->name ?? '—' }}
@@ -423,9 +430,16 @@
                                                     <p class="mt-2 text-xs text-ink/70 font-semibold">{{ $booking->notes }}</p>
                                                 @endif
                                             </div>
-                                            <span class="shrink-0 nb-badge {{ $bStatusTone[$booking->status] ?? 'bg-paper text-ink/70' }}">
-                                                {{ ucfirst($booking->status) }}
-                                            </span>
+                                            <div class="flex flex-col items-end gap-2">
+                                                <span class="shrink-0 nb-badge {{ $bStatusTone[$booking->status] ?? 'bg-paper' }}">
+                                                    {{ ucfirst($booking->status) }}
+                                                </span>
+                                                @if ($booking->status === 'approved')
+                                                    <a href="{{ route('mentoring.session.show', $booking) }}" class="nb-btn nb-btn-primary text-xs px-3 py-1">
+                                                        <i class="fas fa-door-open mr-1"></i>Join Kelas
+                                                    </a>
+                                                @endif
+                                            </div>
                                         </div>
                                     </article>
                                 @endforeach
@@ -612,32 +626,16 @@
                                             </form>
                                         @endif
 
-                                        @if ($exchange->status === 'accepted')
-                                            <form method="POST" action="{{ route('exchange-requests.update', $exchange) }}">
-                                                @csrf
-                                                @method('PATCH')
-                                                <input type="hidden" name="action" value="start">
-                                                <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700">Mulai progress</button>
-                                            </form>
-                                        @endif
-
                                         @if (in_array($exchange->status, ['accepted', 'in_progress'], true))
                                             @php
-                                                $completedByViewer = (int) $exchange->from_user_id === (int) $viewer->id
-                                                    ? $exchange->completed_by_from_user
-                                                    : $exchange->completed_by_to_user;
+                                                $conversation = \App\Models\Conversation::where('exchange_request_id', $exchange->id)->first();
                                             @endphp
-
-                                            @unless ($completedByViewer)
-                                                <form method="POST" action="{{ route('exchange-requests.update', $exchange) }}">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <input type="hidden" name="action" value="complete">
-                                                    <button type="submit" class="rounded-md border border-emerald-200 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50">Konfirmasi selesai</button>
-                                                </form>
-                                            @else
-                                                <span class="shrink-0 nb-badge bg-brand-yellow">Menunggu partner</span>
-                                            @endunless
+                                            
+                                            @if ($conversation)
+                                                <a href="{{ route('chat.show', $conversation) }}" class="nb-btn nb-btn-primary text-xs px-3 py-2">
+                                                    <i class="fas fa-comments mr-1"></i>Buka Chat
+                                                </a>
+                                            @endif
                                         @endif
                                     </div>
 

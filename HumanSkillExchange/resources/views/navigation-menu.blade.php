@@ -16,6 +16,14 @@
                     <a href="{{ route('dashboard') }}" class="nb-btn {{ request()->routeIs('dashboard') ? 'nb-btn-pink' : 'nb-btn-white' }}">Koukan Board</a>
                     <a href="{{ route('market') }}" class="nb-btn {{ request()->routeIs('home', 'market', 'offers.show', 'needs.show') ? 'nb-btn-pink' : 'nb-btn-white' }}">Koukan Market</a>
                     <a href="{{ route('matches') }}" class="nb-btn {{ request()->routeIs('matches') ? 'nb-btn-pink' : 'nb-btn-white' }}">Koukan Match</a>
+                    <a href="{{ route('chat.index') }}" class="nb-btn {{ request()->routeIs('chat.*') ? 'nb-btn-pink' : 'nb-btn-white' }} relative">
+                        <i class="fas fa-comments mr-1"></i>Koukan Chat
+                        @if (Auth::check() && Auth::user()->unreadMessagesTotal() > 0)
+                            <span class="absolute -top-2 -right-2 bg-brand-red text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                {{ Auth::user()->unreadMessagesTotal() }}
+                            </span>
+                        @endif
+                    </a>
                     @can('admin')
                         <a href="{{ route('admin.dashboard') }}" class="nb-btn nb-btn-sky">Admin Panel</a>
                     @endcan
@@ -151,6 +159,14 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('matches') }}" :active="request()->routeIs('matches')">
                 {{ __('Koukan Match') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('chat.index') }}" :active="request()->routeIs('chat.*')">
+                {{ __('Koukan Chat') }}
+                @if (Auth::check() && Auth::user()->unreadMessagesTotal() > 0)
+                    <span class="ml-2 bg-brand-red text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                        {{ Auth::user()->unreadMessagesTotal() }}
+                    </span>
+                @endif
             </x-responsive-nav-link>
         </div>
 

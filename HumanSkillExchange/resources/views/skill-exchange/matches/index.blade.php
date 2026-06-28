@@ -102,11 +102,30 @@
 
                             <div class="mt-5 flex flex-wrap gap-2">
                                 <a href="{{ route('users.profile', $item['user']) }}" class="nb-btn nb-btn-white">
-                                    Lihat Koukan ID
+                                    <i class="fas fa-id-card mr-2"></i>Lihat Koukan ID
                                 </a>
-                                <a href="{{ auth()->check() ? route('dashboard') : route('login') }}" class="nb-btn nb-btn-primary">
-                                    Mulai Exchange
-                                </a>
+                                @if(auth()->check())
+                                    @if($item['user']->offers->count() > 0)
+                                        <a href="{{ route('offers.show', $item['user']->offers->first()) }}" class="nb-btn nb-btn-primary">
+                                            <i class="fas fa-handshake mr-2"></i>Request Exchange
+                                        </a>
+                                    @elseif($item['user']->needs->count() > 0)
+                                        <a href="{{ route('needs.show', $item['user']->needs->first()) }}" class="nb-btn nb-btn-primary">
+                                            <i class="fas fa-handshake mr-2"></i>Request Exchange
+                                        </a>
+                                    @else
+                                        <a href="{{ route('users.profile', $item['user']) }}" class="nb-btn nb-btn-primary">
+                                            <i class="fas fa-handshake mr-2"></i>Mulai Exchange
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('chat.with', $item['user']) }}" class="nb-btn nb-btn-secondary">
+                                        <i class="fas fa-comments mr-2"></i>Chat
+                                    </a>
+                                @else
+                                    <a href="{{ route('login') }}" class="nb-btn nb-btn-primary">
+                                        Login untuk Mulai Exchange
+                                    </a>
+                                @endif
                             </div>
                         </article>
                     @empty

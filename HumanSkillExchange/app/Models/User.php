@@ -123,4 +123,23 @@ class User extends Authenticatable
     {
         return $this->hasMany(MentoringBooking::class);
     }
+
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class, 'user1_id')->orWhere('user2_id', $this->id)->latest('last_message_at');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function unreadMessagesTotal()
+    {
+        $total = 0;
+        foreach ($this->conversations as $conversation) {
+            $total += $conversation->unreadMessagesCount($this);
+        }
+        return $total;
+    }
 }
