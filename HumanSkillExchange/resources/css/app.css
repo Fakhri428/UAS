@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+/* ============================================================
+   Neubrutalism design system
+   Border tebal hitam + hard offset shadow (tanpa blur).
+   ============================================================ */
+@layer components {
+    /* Surfaces */
+    .nb-card {
+        @apply rounded-xl border-2 border-ink bg-white shadow-nb;
+    }
+
+    .nb-panel {
+        @apply rounded-xl border-2 border-ink shadow-nb;
+    }
+
+    /* Buttons */
+    .nb-btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg border-2 border-ink px-4 py-2 text-sm font-bold text-ink shadow-nb transition-all duration-100 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-nb-lg active:translate-x-0 active:translate-y-0 active:shadow-nb-sm;
+    }
+
+    .nb-btn-primary {
+        @apply bg-ink text-white;
+    }
+
+    .nb-btn-yellow {
+        @apply bg-brand-yellow;
+    }
+
+    .nb-btn-pink {
+        @apply bg-brand-pink;
+    }
+
+    .nb-btn-sky {
+        @apply bg-brand-sky;
+    }
+
+    .nb-btn-white {
+        @apply bg-white;
+    }
+
+    /* Inputs */
+    .nb-input {
+        @apply w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm font-medium text-ink shadow-nb-sm transition-shadow placeholder:text-slate-400 focus:shadow-nb focus:outline-none;
+    }
+
+    /* Badge / tag */
+    .nb-badge {
+        @apply inline-flex items-center rounded-md border-2 border-ink px-2 py-0.5 text-xs font-bold text-ink;
+    }
+}

@@ -1,0 +1,2060 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Human Skill Exchange API - Laravel",
+        "description": "REST API Laravel 12 + Jetstream/Sanctum untuk pertukaran skill, need, offer, matching, exchange request, progress, review, dan reputasi.",
+        "version": "2.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000/api",
+            "description": "Laravel local development server"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Authentication"
+        },
+        {
+            "name": "Subscription"
+        },
+        {
+            "name": "Profile"
+        },
+        {
+            "name": "Skills"
+        },
+        {
+            "name": "Needs"
+        },
+        {
+            "name": "Offers"
+        },
+        {
+            "name": "Matching"
+        },
+        {
+            "name": "Exchange"
+        },
+        {
+            "name": "Reviews"
+        },
+        {
+            "name": "Reputation"
+        }
+    ],
+    "paths": {
+        "/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register user baru dan dapatkan token",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            },
+                            "example": {
+                                "name": "Dina",
+                                "email": "dina@example.com",
+                                "password": "password123"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/AuthSuccess"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login dan dapatkan Bearer Token Sanctum",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            },
+                            "example": {
+                                "email": "fakhri@example.com",
+                                "password": "password123"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/AuthSuccess"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout token aktif",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                }
+            }
+        },
+        "/me": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Ambil user login",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                }
+            }
+        },
+        "/plans": {
+            "get": {
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Daftar paket langganan",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/subscription": {
+            "get": {
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Paket aktif user login",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Aktifkan paket",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscribeRequest"
+                            },
+                            "example": {
+                                "plan_id": 2
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Batalkan subscription dan kembali ke Gratis",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/profile": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Ambil profil user login atau user lain",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UserId"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Buat atau update profil",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/ProfileBody"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update profil",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/ProfileBody"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/skills": {
+            "get": {
+                "tags": [
+                    "Skills"
+                ],
+                "summary": "Daftar skill user",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UserId"
+                    },
+                    {
+                        "$ref": "#/components/parameters/Search"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Skills"
+                ],
+                "summary": "Tambah skill",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/SkillBody"
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/ValidationError"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Skills"
+                ],
+                "summary": "Update skill via query id",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/SkillBody"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Skills"
+                ],
+                "summary": "Hapus skill via query id",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/skills/{id}": {
+            "get": {
+                "tags": [
+                    "Skills"
+                ],
+                "summary": "Detail skill",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Skills"
+                ],
+                "summary": "Update skill",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/SkillBody"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Skills"
+                ],
+                "summary": "Hapus skill",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/needs": {
+            "get": {
+                "tags": [
+                    "Needs"
+                ],
+                "summary": "Daftar need user",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UserId"
+                    },
+                    {
+                        "$ref": "#/components/parameters/Search"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Needs"
+                ],
+                "summary": "Tambah need",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/NeedBody"
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Needs"
+                ],
+                "summary": "Update need via query id",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/NeedBody"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Needs"
+                ],
+                "summary": "Hapus need via query id",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/needs/{id}": {
+            "get": {
+                "tags": [
+                    "Needs"
+                ],
+                "summary": "Detail need",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Needs"
+                ],
+                "summary": "Update need",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/NeedBody"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Needs"
+                ],
+                "summary": "Hapus need",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/offers": {
+            "get": {
+                "tags": [
+                    "Offers"
+                ],
+                "summary": "Daftar offer user",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UserId"
+                    },
+                    {
+                        "$ref": "#/components/parameters/Search"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Offers"
+                ],
+                "summary": "Tambah offer",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/OfferBody"
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Offers"
+                ],
+                "summary": "Update offer via query id",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/OfferBody"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Offers"
+                ],
+                "summary": "Hapus offer via query id",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/offers/{id}": {
+            "get": {
+                "tags": [
+                    "Offers"
+                ],
+                "summary": "Detail offer",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Offers"
+                ],
+                "summary": "Update offer",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/OfferBody"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Offers"
+                ],
+                "summary": "Hapus offer",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/exchange_types": {
+            "get": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Daftar jenis exchange",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/exchange-types": {
+            "get": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Alias daftar jenis exchange",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/matches": {
+            "get": {
+                "tags": [
+                    "Matching"
+                ],
+                "summary": "Rule-based matching user, offer, atau need",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "offer_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": false
+                    },
+                    {
+                        "name": "need_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            }
+        },
+        "/exchange_requests": {
+            "get": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Daftar exchange request user login",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Kirim exchange request",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExchangeRequestCreate"
+                            },
+                            "example": {
+                                "to_user_id": 3,
+                                "offer_id": 1,
+                                "need_id": 2,
+                                "message": "Halo, saya bisa bantu Laravel REST API."
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Update exchange request via query id",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    },
+                    {
+                        "$ref": "#/components/parameters/Action"
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExchangeStatusUpdate"
+                            },
+                            "example": {
+                                "status": "accepted"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/exchange_requests/{id}": {
+            "get": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Detail exchange request",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Update status atau konfirmasi selesai",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    },
+                    {
+                        "$ref": "#/components/parameters/Action"
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExchangeStatusUpdate"
+                            },
+                            "example": {
+                                "status": "accepted"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                }
+            }
+        },
+        "/exchange-requests": {
+            "get": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Daftar exchange request user login",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Kirim exchange request",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExchangeRequestCreate"
+                            },
+                            "example": {
+                                "to_user_id": 3,
+                                "offer_id": 1,
+                                "need_id": 2,
+                                "message": "Halo, saya bisa bantu Laravel REST API."
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Update exchange request via query id",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    },
+                    {
+                        "$ref": "#/components/parameters/Action"
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExchangeStatusUpdate"
+                            },
+                            "example": {
+                                "status": "accepted"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/exchange-requests/{id}": {
+            "get": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Detail exchange request",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Update status atau konfirmasi selesai",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    },
+                    {
+                        "$ref": "#/components/parameters/Action"
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExchangeStatusUpdate"
+                            },
+                            "example": {
+                                "status": "accepted"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                }
+            }
+        },
+        "/exchange_progress": {
+            "get": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Daftar progress exchange",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ExchangeRequestId"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Tambah progress exchange",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ExchangeRequestId"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExchangeProgressRequest"
+                            },
+                            "example": {
+                                "progress_note": "Endpoint CRUD sudah selesai.",
+                                "file_url": "https://example.com/progress.pdf"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Update progress via query id",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExchangeProgressRequest"
+                            },
+                            "example": {
+                                "progress_note": "Progress diperbarui."
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Hapus progress via query id",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/exchange_progress/{id}": {
+            "put": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Update progress exchange",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExchangeProgressRequest"
+                            },
+                            "example": {
+                                "progress_note": "Progress diperbarui."
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Hapus progress",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/exchange-progress": {
+            "get": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Daftar progress exchange",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ExchangeRequestId"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Tambah progress exchange",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ExchangeRequestId"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExchangeProgressRequest"
+                            },
+                            "example": {
+                                "progress_note": "Endpoint CRUD sudah selesai.",
+                                "file_url": "https://example.com/progress.pdf"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Update progress via query id",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExchangeProgressRequest"
+                            },
+                            "example": {
+                                "progress_note": "Progress diperbarui."
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Hapus progress via query id",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/IdQuery"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/exchange-progress/{id}": {
+            "put": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Update progress exchange",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExchangeProgressRequest"
+                            },
+                            "example": {
+                                "progress_note": "Progress diperbarui."
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Hapus progress",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            }
+        },
+        "/reviews": {
+            "get": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Ambil review berdasarkan user",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UserIdRequired"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Buat review setelah exchange selesai",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReviewRequest"
+                            },
+                            "example": {
+                                "exchange_request_id": 1,
+                                "reviewed_user_id": 3,
+                                "rating": 5,
+                                "comment": "Partner responsif dan hasilnya sesuai."
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "409": {
+                        "$ref": "#/components/responses/Conflict"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                }
+            }
+        },
+        "/reputation": {
+            "get": {
+                "tags": [
+                    "Reputation"
+                ],
+                "summary": "Hitung reputasi user",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UserId"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Success"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        },
+        "parameters": {
+            "Id": {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                    "type": "integer"
+                }
+            },
+            "IdQuery": {
+                "name": "id",
+                "in": "query",
+                "required": true,
+                "schema": {
+                    "type": "integer"
+                }
+            },
+            "UserId": {
+                "name": "user_id",
+                "in": "query",
+                "required": false,
+                "schema": {
+                    "type": "integer"
+                }
+            },
+            "UserIdRequired": {
+                "name": "user_id",
+                "in": "query",
+                "required": true,
+                "schema": {
+                    "type": "integer"
+                }
+            },
+            "Search": {
+                "name": "search",
+                "in": "query",
+                "required": false,
+                "schema": {
+                    "type": "string"
+                }
+            },
+            "ExchangeRequestId": {
+                "name": "exchange_request_id",
+                "in": "query",
+                "required": true,
+                "schema": {
+                    "type": "integer"
+                }
+            },
+            "Action": {
+                "name": "action",
+                "in": "query",
+                "required": false,
+                "schema": {
+                    "type": "string",
+                    "enum": [
+                        "status",
+                        "complete"
+                    ]
+                }
+            }
+        },
+        "schemas": {
+            "ApiResponse": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "boolean"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "data": {
+                        "description": "Payload response API, dapat berupa object, array, string, number, boolean, atau null."
+                    }
+                }
+            },
+            "RegisterRequest": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "email",
+                    "password"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 8
+                    }
+                }
+            },
+            "LoginRequest": {
+                "type": "object",
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                }
+            },
+            "SubscribeRequest": {
+                "type": "object",
+                "required": [
+                    "plan_id"
+                ],
+                "properties": {
+                    "plan_id": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "ProfileRequest": {
+                "type": "object",
+                "required": [
+                    "bio",
+                    "location",
+                    "work_mode",
+                    "available_time"
+                ],
+                "properties": {
+                    "bio": {
+                        "type": "string"
+                    },
+                    "location": {
+                        "type": "string"
+                    },
+                    "work_mode": {
+                        "type": "string",
+                        "enum": [
+                            "online",
+                            "offline",
+                            "hybrid"
+                        ]
+                    },
+                    "available_time": {
+                        "type": "string"
+                    },
+                    "portfolio_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "social_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                }
+            },
+            "SkillRequest": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "category",
+                    "level"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "string"
+                    },
+                    "level": {
+                        "type": "string",
+                        "enum": [
+                            "beginner",
+                            "intermediate",
+                            "advanced"
+                        ]
+                    }
+                }
+            },
+            "NeedRequest": {
+                "type": "object",
+                "required": [
+                    "title",
+                    "category",
+                    "description",
+                    "exchange_offer"
+                ],
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "exchange_offer": {
+                        "type": "string"
+                    }
+                }
+            },
+            "OfferRequest": {
+                "type": "object",
+                "required": [
+                    "title",
+                    "type",
+                    "category",
+                    "description",
+                    "exchange_expectation"
+                ],
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "skill",
+                            "time",
+                            "experience",
+                            "mentoring",
+                            "project",
+                            "collaboration"
+                        ]
+                    },
+                    "category": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "exchange_expectation": {
+                        "type": "string"
+                    },
+                    "available_duration": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                }
+            },
+            "ExchangeRequestCreate": {
+                "type": "object",
+                "required": [
+                    "to_user_id",
+                    "offer_id",
+                    "need_id",
+                    "message"
+                ],
+                "properties": {
+                    "to_user_id": {
+                        "type": "integer"
+                    },
+                    "offer_id": {
+                        "type": "integer"
+                    },
+                    "need_id": {
+                        "type": "integer"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ExchangeStatusUpdate": {
+                "type": "object",
+                "required": [
+                    "status"
+                ],
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "accepted",
+                            "rejected",
+                            "in_progress",
+                            "cancelled"
+                        ]
+                    }
+                }
+            },
+            "ExchangeProgressRequest": {
+                "type": "object",
+                "required": [
+                    "progress_note"
+                ],
+                "properties": {
+                    "progress_note": {
+                        "type": "string"
+                    },
+                    "file_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                }
+            },
+            "ReviewRequest": {
+                "type": "object",
+                "required": [
+                    "exchange_request_id",
+                    "reviewed_user_id",
+                    "rating",
+                    "comment"
+                ],
+                "properties": {
+                    "exchange_request_id": {
+                        "type": "integer"
+                    },
+                    "reviewed_user_id": {
+                        "type": "integer"
+                    },
+                    "rating": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 5
+                    },
+                    "comment": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "requestBodies": {
+            "ProfileBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ProfileRequest"
+                        },
+                        "example": {
+                            "bio": "Backend learner yang suka membuat REST API.",
+                            "location": "Purwokerto",
+                            "work_mode": "online",
+                            "available_time": "Malam dan akhir pekan",
+                            "portfolio_url": "https://portfolio.example.com/fakhri",
+                            "social_url": "https://linkedin.com/in/fakhri"
+                        }
+                    }
+                }
+            },
+            "SkillBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/SkillRequest"
+                        },
+                        "example": {
+                            "name": "Laravel REST API",
+                            "category": "Programming",
+                            "level": "intermediate"
+                        }
+                    }
+                }
+            },
+            "NeedBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/NeedRequest"
+                        },
+                        "example": {
+                            "title": "Butuh bantuan desain UI dashboard",
+                            "category": "Design",
+                            "description": "Saya membutuhkan desain dashboard untuk aplikasi REST API.",
+                            "exchange_offer": "Saya bisa membantu endpoint CRUD dan dokumentasi API."
+                        }
+                    }
+                }
+            },
+            "OfferBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/OfferRequest"
+                        },
+                        "example": {
+                            "title": "Saya bisa bantu membuat REST API Laravel",
+                            "type": "skill",
+                            "category": "Programming",
+                            "description": "Saya bisa membantu API login, CRUD, validasi, dan dokumentasi Postman.",
+                            "exchange_expectation": "Saya membutuhkan bantuan desain UI dashboard.",
+                            "available_duration": "4 jam per minggu"
+                        }
+                    }
+                }
+            }
+        },
+        "responses": {
+            "Success": {
+                "description": "Response berhasil",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ApiResponse"
+                        }
+                    }
+                }
+            },
+            "AuthSuccess": {
+                "description": "Autentikasi berhasil",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "status": true,
+                            "message": "Login berhasil",
+                            "data": {
+                                "user": {
+                                    "id": 2,
+                                    "name": "Fakhri",
+                                    "email": "fakhri@example.com",
+                                    "role": "user",
+                                    "plan": "Gratis"
+                                },
+                                "token_type": "Bearer",
+                                "access_token": "1|plain-text-sanctum-token"
+                            }
+                        }
+                    }
+                }
+            },
+            "Unauthorized": {
+                "description": "Token tidak valid atau kredensial salah"
+            },
+            "NotFound": {
+                "description": "Data tidak ditemukan"
+            },
+            "Conflict": {
+                "description": "Data konflik atau duplikat"
+            },
+            "ValidationError": {
+                "description": "Validasi gagal"
+            }
+        }
+    },
+    "security": []
+}
