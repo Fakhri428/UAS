@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Human Skill Exchange API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/rapidoc/9.3.8/rapidoc-min.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hero">
+    <nav class="navbar">
+        <a class="brand" href="#top" aria-label="Human Skill Exchange API">
+            <span class="brand-mark">HSE</span>
+            <span>Human Skill Exchange API</span>
+        </a>
+
+        <div class="nav-links">
+            <a href="#tujuan">Tujuan</a>
+            <a href="#alur">Alur</a>
+            <a href="#endpoint">Endpoint</a>
+            <a href="#tester">Tester</a>
+            <a href="#rapidoc">RapiDoc</a>
+        </div>
+    </nav>
+
+    <section id="top" class="hero-content">
+        <div class="hero-copy">
+            <p class="eyebrow">Praktikum Web Service</p>
+            <h1>Human Skill Exchange API</h1>
+            <p>
+                REST API untuk mempertemukan pengguna berdasarkan skill, kebutuhan,
+                penawaran, exchange request, progress, review, dan reputasi.
+            </p>
+
+            <div class="hero-actions">
+                <a class="btn primary" href="#rapidoc">Buka Dokumentasi</a>
+                <a class="btn secondary" href="#tester">Coba Endpoint</a>
+            </div>
+        </div>
+
+        <div class="api-console" aria-label="Contoh request API">
+            <div class="console-bar">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <pre id="typing-code"></pre>
+        </div>
+    </section>
+</header>
+
+<main>
+    <section id="tujuan" class="section">
+        <div class="section-title">
+            <p>Bagian 1</p>
+            <h2>Tujuan Project</h2>
+        </div>
+
+        <div class="grid cards">
+            <article class="card fade-up">
+                <span class="card-number">01</span>
+                <h3>Profil dan Personal Branding</h3>
+                <p>User dapat membuat profil, mencatat skill, dan menampilkan portofolio.</p>
+            </article>
+
+            <article class="card fade-up">
+                <span class="card-number">02</span>
+                <h3>Skill, Need, dan Offer</h3>
+                <p>API mencatat kemampuan yang dimiliki, kebutuhan bantuan, dan penawaran kontribusi.</p>
+            </article>
+
+            <article class="card fade-up">
+                <span class="card-number">03</span>
+                <h3>Rule-Based Matching</h3>
+                <p>Sistem memberi rekomendasi berdasarkan kategori, kata kunci, mode kerja, dan rating.</p>
+            </article>
+
+            <article class="card fade-up">
+                <span class="card-number">04</span>
+                <h3>Exchange dan Reputasi</h3>
+                <p>User dapat mengirim request, update progress, menyelesaikan exchange, dan memberi review.</p>
+            </article>
+        </div>
+    </section>
+
+    <section id="alur" class="section dark-band">
+        <div class="section-title light">
+            <p>Bagian 2</p>
+            <h2>Alur Sistem</h2>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <span>1</span>
+                <div>
+                    <h3>Register dan Profil</h3>
+                    <p>User register, login, lalu mengisi bio, lokasi, mode kerja, dan waktu tersedia.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <span>2</span>
+                <div>
+                    <h3>Kontribusi dan Kebutuhan</h3>
+                    <p>User menambahkan skill, need, dan offer sesuai kontribusi yang dapat ditukar.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <span>3</span>
+                <div>
+                    <h3>Matching dan Request</h3>
+                    <p>API menghitung kecocokan, lalu user mengirim exchange request kepada partner.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <span>4</span>
+                <div>
+                    <h3>Progress, Review, Reputasi</h3>
+                    <p>Exchange dijalankan, dikonfirmasi selesai oleh dua pihak, lalu dinilai dengan review.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="endpoint" class="section">
+        <div class="section-title">
+            <p>Bagian 3</p>
+            <h2>Endpoint Praktikum</h2>
+        </div>
+
+        <div class="endpoint-table-wrapper">
+            <table class="endpoint-table">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Fungsi</th>
+                        <th>Token</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Auth -->
+                    <tr><td colspan="4" style="background:#f3f4f6;font-weight:700;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">Autentikasi</td></tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/register</td>
+                        <td>Register user baru</td>
+                        <td>Tidak</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/login</td>
+                        <td>Login dan mendapatkan Bearer Token</td>
+                        <td>Tidak</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/logout</td>
+                        <td>Logout dan cabut token</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/me</td>
+                        <td>Data user yang sedang login</td>
+                        <td>Ya</td>
+                    </tr>
+                    <!-- Profile -->
+                    <tr><td colspan="4" style="background:#f3f4f6;font-weight:700;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">Profil</td></tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/profile</td>
+                        <td>Lihat profil user login</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/profile</td>
+                        <td>Buat atau update profil</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/users/{id}/profile</td>
+                        <td>Profil publik user lain</td>
+                        <td>Ya</td>
+                    </tr>
+                    <!-- Skills -->
+                    <tr><td colspan="4" style="background:#f3f4f6;font-weight:700;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">Skill</td></tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/skills</td>
+                        <td>Daftar skill milik user</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/skills</td>
+                        <td>Tambah skill baru</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/skills/{id}</td>
+                        <td>Detail skill</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td>/api/skills/{id}</td>
+                        <td>Update skill</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method delete">DELETE</span></td>
+                        <td>/api/skills/{id}</td>
+                        <td>Hapus skill</td>
+                        <td>Ya</td>
+                    </tr>
+                    <!-- Needs -->
+                    <tr><td colspan="4" style="background:#f3f4f6;font-weight:700;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">Need</td></tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/needs</td>
+                        <td>Daftar need</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/needs</td>
+                        <td>Buat need baru</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td>/api/needs/{id}</td>
+                        <td>Update need</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method delete">DELETE</span></td>
+                        <td>/api/needs/{id}</td>
+                        <td>Hapus need</td>
+                        <td>Ya</td>
+                    </tr>
+                    <!-- Offers -->
+                    <tr><td colspan="4" style="background:#f3f4f6;font-weight:700;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">Offer</td></tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/offers</td>
+                        <td>Daftar offer</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/offers</td>
+                        <td>Buat offer baru</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td>/api/offers/{id}</td>
+                        <td>Update offer</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method delete">DELETE</span></td>
+                        <td>/api/offers/{id}</td>
+                        <td>Hapus offer</td>
+                        <td>Ya</td>
+                    </tr>
+                    <!-- Portfolio -->
+                    <tr><td colspan="4" style="background:#f3f4f6;font-weight:700;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">Portfolio</td></tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/portfolios</td>
+                        <td>Daftar portfolio user</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/portfolios</td>
+                        <td>Tambah portfolio</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td>/api/portfolios/{id}</td>
+                        <td>Update portfolio</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method delete">DELETE</span></td>
+                        <td>/api/portfolios/{id}</td>
+                        <td>Hapus portfolio</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/users/{id}/portfolios</td>
+                        <td>Portfolio publik user lain</td>
+                        <td>Ya</td>
+                    </tr>
+                    <!-- Matching -->
+                    <tr><td colspan="4" style="background:#f3f4f6;font-weight:700;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">Matching</td></tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/matches</td>
+                        <td>Rekomendasi match untuk user login</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/offers/{id}/matches</td>
+                        <td>Match berdasarkan offer tertentu</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/needs/{id}/matches</td>
+                        <td>Match berdasarkan need tertentu</td>
+                        <td>Ya</td>
+                    </tr>
+                    <!-- Exchange -->
+                    <tr><td colspan="4" style="background:#f3f4f6;font-weight:700;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">Exchange Request</td></tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/exchange-requests</td>
+                        <td>Daftar exchange request</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/exchange-requests</td>
+                        <td>Kirim exchange request baru</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method patch">PATCH</span></td>
+                        <td>/api/exchange-requests/{id}/status</td>
+                        <td>Accept, reject, atau ubah status</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method patch">PATCH</span></td>
+                        <td>/api/exchange-requests/{id}/complete</td>
+                        <td>Konfirmasi exchange selesai</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/exchange-requests/{id}/progress</td>
+                        <td>Daftar progress exchange</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/exchange-requests/{id}/progress</td>
+                        <td>Tambah catatan progress</td>
+                        <td>Ya</td>
+                    </tr>
+                    <!-- Reviews -->
+                    <tr><td colspan="4" style="background:#f3f4f6;font-weight:700;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">Review & Reputasi</td></tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/reviews</td>
+                        <td>Kirim review setelah exchange selesai</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/users/{id}/reviews</td>
+                        <td>Daftar review milik user</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/reputation</td>
+                        <td>Reputasi user login</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/users/{id}/reputation</td>
+                        <td>Reputasi user lain</td>
+                        <td>Ya</td>
+                    </tr>
+                    <!-- Subscription -->
+                    <tr><td colspan="4" style="background:#f3f4f6;font-weight:700;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">Subscription & Transaksi</td></tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/plans</td>
+                        <td>Daftar paket plan</td>
+                        <td>Tidak</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/subscription</td>
+                        <td>Plan aktif user login</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/subscription</td>
+                        <td>Berlangganan plan</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/transactions</td>
+                        <td>Riwayat transaksi user</td>
+                        <td>Ya</td>
+                    </tr>
+                    <!-- Mentoring -->
+                    <tr><td colspan="4" style="background:#f3f4f6;font-weight:700;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">Mentoring</td></tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/mentoring-rooms</td>
+                        <td>Daftar ruang mentoring</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/mentoring-rooms</td>
+                        <td>Buat ruang mentoring (Pro Max)</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td>/api/mentoring-rooms/{id}/book</td>
+                        <td>Booking sesi mentoring</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/mentoring-bookings</td>
+                        <td>Daftar booking milik user</td>
+                        <td>Ya</td>
+                    </tr>
+                    <!-- Admin -->
+                    <tr><td colspan="4" style="background:#f3f4f6;font-weight:700;padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">Admin</td></tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/admin/users</td>
+                        <td>Daftar semua user (admin only)</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method patch">PATCH</span></td>
+                        <td>/api/admin/users/{id}/verify</td>
+                        <td>Verifikasi user (admin only)</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/admin/exchanges</td>
+                        <td>Semua exchange request (admin only)</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/admin/reviews</td>
+                        <td>Semua review (admin only)</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method patch">PATCH</span></td>
+                        <td>/api/admin/reviews/{id}/hide</td>
+                        <td>Sembunyikan review (admin only)</td>
+                        <td>Ya</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td>/api/admin/transactions</td>
+                        <td>Semua transaksi (admin only)</td>
+                        <td>Ya</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="tester" class="section tester-section">
+        <div class="section-title">
+            <p>Bagian 4</p>
+            <h2>Latihan Cepat dengan Fetch API</h2>
+        </div>
+
+        <div class="tester-layout">
+            <div class="tester-panel">
+                <h3>Uji Endpoint dari Browser</h3>
+                <p>
+                    Tombol berikut memakai data seed dari Laravel (`HumanSkillExchangeSeeder`).
+                    Pastikan server Laravel aktif (`php artisan serve`) dan database sudah di-seed.
+                </p>
+
+                <div class="button-row">
+                    <button id="btnLogin" class="btn primary" type="button">Tes Login</button>
+                    <button id="btnMatches" class="btn secondary-dark" type="button">Ambil Match</button>
+                    <button id="btnPlans" class="btn ghost" type="button">Lihat Paket</button>
+                </div>
+            </div>
+
+            <div class="result-panel">
+                <div class="result-header">
+                    <span>Response JSON</span>
+                    <small>Bearer fakhri-token-123</small>
+                </div>
+                <pre id="apiResult">Belum ada request.</pre>
+            </div>
+        </div>
+    </section>
+
+    <section id="rapidoc" class="section rapidoc-section">
+        <div class="section-title">
+            <p>Bagian 5</p>
+            <h2>Dokumentasi API dengan RapiDoc</h2>
+        </div>
+
+        <p class="doc-note">
+            Gunakan tombol Authorize pada RapiDoc, lalu masukkan token:
+            <strong>fakhri-token-123</strong>. Endpoint yang membutuhkan autentikasi
+            dapat langsung dicoba dari dokumentasi ini.
+        </p>
+
+        <div class="rapidoc-wrapper">
+            <rapi-doc
+                spec-url="openapi.json"
+                render-style="read"
+                theme="light"
+                layout="row"
+                show-header="false"
+                show-info="true"
+                allow-authentication="true"
+                allow-server-selection="true"
+                allow-try="true"
+                regular-font="Inter, Arial, sans-serif"
+                mono-font="Courier New"
+                bg-color="#ffffff"
+                text-color="#1f2937"
+                primary-color="#117865"
+                nav-bg-color="#12312b"
+                nav-text-color="#e7f4ef"
+                nav-hover-bg-color="#1d4a42"
+                nav-hover-text-color="#ffffff"
+                style="height: 820px; width: 100%; border-radius: 8px; overflow: hidden;">
+            </rapi-doc>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <p>Human Skill Exchange API. PHP Native, MySQL, Bearer Token, OpenAPI, dan RapiDoc.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

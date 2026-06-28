@@ -1,0 +1,1294 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Human Skill Exchange API (Laravel)",
+    "description": "Dokumentasi REST API platform pertukaran skill, waktu, pengalaman, mentoring, bantuan project, dan kolaborasi berbasis matching dan reputasi.\n\nImplementasi backend menggunakan Laravel + Sanctum. Seluruh endpoint berada di bawah prefix `/api`, autentikasi memakai Bearer Token (Laravel Sanctum), dan respons memakai envelope standar `{ status, message, data }`.\n\nAkun seed untuk pengujian:\n\n| Nama | Email | Role | Token |\n|---|---|---|---|\n| Fakhri | fakhri@example.com | user | `fakhri-token-123` |\n| Raka | raka@example.com | user | `raka-token-123` |\n| Admin Human Skill | admin@hse.test | admin | `admin-token-123` |\n\nPassword semua akun: `password123`.",
+    "version": "2.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000/api",
+      "description": "Laravel local development server (php artisan serve)"
+    },
+    {
+      "url": "http://localhost/api",
+      "description": "Laravel via web server (Apache/Nginx)"
+    }
+  ],
+  "tags": [
+    { "name": "Authentication", "description": "Register, login, logout, dan user login" },
+    { "name": "Subscription", "description": "Paket Gratis, Pro, dan Pro Max" },
+    { "name": "Profile", "description": "Profil personal branding pengguna" },
+    { "name": "Skills", "description": "Skill yang dimiliki pengguna" },
+    { "name": "Needs", "description": "Kebutuhan bantuan pengguna" },
+    { "name": "Offers", "description": "Penawaran kontribusi pengguna" },
+    { "name": "Portfolios", "description": "Portofolio karya pengguna" },
+    { "name": "Exchange Types", "description": "Jenis exchange yang didukung" },
+    { "name": "Matching", "description": "Rule-based matching" },
+    { "name": "Exchange Requests", "description": "Exchange request, status, dan completion" },
+    { "name": "Exchange Progress", "description": "Progress pengerjaan exchange" },
+    { "name": "Reviews", "description": "Review dan rating" },
+    { "name": "Reputation", "description": "Perhitungan reputasi user" },
+    { "name": "Mentoring Rooms", "description": "Ruang mentoring berbayar" },
+    { "name": "Mentoring Bookings", "description": "Booking sesi mentoring" },
+    { "name": "Transactions", "description": "Transaksi pembayaran" },
+    { "name": "Admin", "description": "Endpoint khusus admin (role admin)" }
+  ],
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register user baru",
+        "description": "Membuat user baru dengan paket Gratis, lalu mengembalikan Bearer Token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterRequest" },
+              "example": { "name": "Dina", "email": "dina@example.com", "password": "password123" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Register berhasil",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": true,
+                  "message": "Register berhasil",
+                  "data": {
+                    "user": { "id": 4, "name": "Dina", "email": "dina@example.com", "role": "user", "plan": "Gratis" },
+                    "token_type": "Bearer",
+                    "access_token": "1|xxxxxxxxxxxxxxxxxxxxxxxx"
+                  }
+                }
+              }
+            }
+          },
+          "422": { "description": "Validasi gagal (email sudah dipakai / password < 8 karakter)" }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login dan mendapatkan Bearer Token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" },
+              "example": { "email": "fakhri@example.com", "password": "password123" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login berhasil",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": true,
+                  "message": "Login berhasil",
+                  "data": {
+                    "user": { "id": 1, "name": "Fakhri", "email": "fakhri@example.com", "role": "user", "plan": "Gratis" },
+                    "token_type": "Bearer",
+                    "access_token": "fakhri-token-123"
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Email atau password salah" },
+          "422": { "description": "Validasi gagal" }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout user login",
+        "description": "Menghapus token akses yang sedang digunakan.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Logout berhasil" },
+          "401": { "description": "Token tidak valid" }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Mengambil data user login",
+        "description": "Alias: `GET /user`.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Data user login berhasil diambil",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": true,
+                  "message": "Data user login berhasil diambil",
+                  "data": { "id": 1, "name": "Fakhri", "email": "fakhri@example.com", "role": "user", "plan": "Gratis" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Token tidak valid" }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Alias dari /me",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Data user login berhasil diambil" } }
+      }
+    },
+    "/plans": {
+      "get": {
+        "tags": ["Subscription"],
+        "summary": "Melihat daftar paket langganan",
+        "description": "Diurutkan berdasarkan harga. Tidak membutuhkan token.",
+        "responses": { "200": { "description": "Data paket berhasil diambil" } }
+      }
+    },
+    "/subscription": {
+      "get": {
+        "tags": ["Subscription"],
+        "summary": "Melihat paket aktif user login",
+        "description": "Alias: `GET /my-plan`.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Paket aktif berhasil diambil" } }
+      },
+      "post": {
+        "tags": ["Subscription"],
+        "summary": "Mengaktifkan paket langganan",
+        "description": "Alias: `POST /subscribe`.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SubscribeRequest" },
+              "example": { "plan_id": 2 }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Paket berhasil diaktifkan" },
+          "422": { "description": "plan_id tidak valid atau tidak ada di tabel plans" }
+        }
+      },
+      "patch": {
+        "tags": ["Subscription"],
+        "summary": "Membatalkan subscription dan kembali ke Gratis",
+        "description": "Alias: `PATCH /subscribe/cancel`.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Subscription dibatalkan, paket kembali ke Gratis" },
+          "404": { "description": "Paket Gratis tidak ditemukan" }
+        }
+      }
+    },
+    "/my-plan": {
+      "get": {
+        "tags": ["Subscription"],
+        "summary": "Alias dari GET /subscription",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Paket aktif berhasil diambil" } }
+      }
+    },
+    "/subscribe": {
+      "post": {
+        "tags": ["Subscription"],
+        "summary": "Alias dari POST /subscription",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SubscribeRequest" },
+              "example": { "plan_id": 2 }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Paket berhasil diaktifkan" } }
+      }
+    },
+    "/subscribe/cancel": {
+      "patch": {
+        "tags": ["Subscription"],
+        "summary": "Alias dari PATCH /subscription",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Subscription dibatalkan" } }
+      }
+    },
+    "/profile": {
+      "get": {
+        "tags": ["Profile"],
+        "summary": "Mengambil profil user login atau user lain",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "user_id", "in": "query", "required": false, "description": "ID user lain. Jika kosong, mengambil profil user login.", "schema": { "type": "integer" }, "example": 2 }
+        ],
+        "responses": {
+          "200": { "description": "Profil berhasil diambil" },
+          "404": { "description": "Profil user tidak ditemukan" }
+        }
+      },
+      "post": {
+        "tags": ["Profile"],
+        "summary": "Membuat atau memperbarui profil (updateOrCreate)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/ProfileRequest" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Profil berhasil disimpan" },
+          "422": { "description": "Validasi gagal" }
+        }
+      },
+      "put": {
+        "tags": ["Profile"],
+        "summary": "Memperbarui profil (sama dengan POST)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/ProfileRequest" } }
+          }
+        },
+        "responses": { "200": { "description": "Profil berhasil disimpan" } }
+      }
+    },
+    "/users/{id}/profile": {
+      "get": {
+        "tags": ["Profile"],
+        "summary": "Melihat profil publik user lain (tanpa email)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "Profil publik berhasil diambil" },
+          "404": { "description": "Profil user tidak ditemukan" }
+        }
+      }
+    },
+    "/users/{id}/reviews": {
+      "get": {
+        "tags": ["Reviews"],
+        "summary": "Melihat review yang diterima user (tanpa review tersembunyi)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Review user berhasil diambil" } }
+      }
+    },
+    "/users/{id}/reputation": {
+      "get": {
+        "tags": ["Reputation"],
+        "summary": "Menghitung reputasi user tertentu",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "Reputasi user berhasil dihitung" },
+          "404": { "description": "User tidak ditemukan" }
+        }
+      }
+    },
+    "/users/{id}/portfolios": {
+      "get": {
+        "tags": ["Portfolios"],
+        "summary": "Melihat portofolio user tertentu",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Portfolio user berhasil diambil" } }
+      }
+    },
+    "/skills": {
+      "get": {
+        "tags": ["Skills"],
+        "summary": "Daftar skill (atau detail bila id dikirim)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "query", "required": false, "description": "Jika dikirim, mengembalikan detail skill.", "schema": { "type": "integer" }, "example": 1 },
+          { "name": "user_id", "in": "query", "required": false, "description": "Filter berdasarkan pemilik. Default user login.", "schema": { "type": "integer" }, "example": 2 },
+          { "name": "search", "in": "query", "required": false, "schema": { "type": "string" }, "example": "Laravel" }
+        ],
+        "responses": { "200": { "description": "Data skill berhasil diambil" } }
+      },
+      "post": {
+        "tags": ["Skills"],
+        "summary": "Menambahkan skill",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SkillRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "Skill berhasil ditambahkan" },
+          "403": { "description": "Batas skill paket tercapai" },
+          "422": { "description": "Validasi gagal" }
+        }
+      },
+      "put": {
+        "tags": ["Skills"],
+        "summary": "Memperbarui skill via query id",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SkillRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Skill berhasil diperbarui" },
+          "400": { "description": "Parameter id wajib dikirim" },
+          "404": { "description": "Skill tidak ditemukan atau bukan milik Anda" }
+        }
+      },
+      "delete": {
+        "tags": ["Skills"],
+        "summary": "Menghapus skill via query id",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "responses": {
+          "200": { "description": "Skill berhasil dihapus" },
+          "404": { "description": "Skill tidak ditemukan atau bukan milik Anda" }
+        }
+      }
+    },
+    "/skills/{id}": {
+      "get": {
+        "tags": ["Skills"],
+        "summary": "Detail skill",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Detail skill berhasil diambil" }, "404": { "description": "Skill tidak ditemukan" } }
+      },
+      "put": {
+        "tags": ["Skills"],
+        "summary": "Memperbarui skill",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SkillRequest" } } }
+        },
+        "responses": { "200": { "description": "Skill berhasil diperbarui" }, "404": { "description": "Skill tidak ditemukan atau bukan milik Anda" } }
+      },
+      "delete": {
+        "tags": ["Skills"],
+        "summary": "Menghapus skill",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Skill berhasil dihapus" } }
+      }
+    },
+    "/needs": {
+      "get": {
+        "tags": ["Needs"],
+        "summary": "Daftar need (atau detail bila id dikirim)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "query", "required": false, "schema": { "type": "integer" }, "example": 1 },
+          { "name": "user_id", "in": "query", "required": false, "schema": { "type": "integer" }, "example": 2 },
+          { "name": "search", "in": "query", "required": false, "schema": { "type": "string" }, "example": "UI" }
+        ],
+        "responses": { "200": { "description": "Data need berhasil diambil" } }
+      },
+      "post": {
+        "tags": ["Needs"],
+        "summary": "Menambahkan need",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NeedRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "Need berhasil ditambahkan" },
+          "403": { "description": "Batas need paket tercapai" },
+          "422": { "description": "Validasi gagal" }
+        }
+      },
+      "put": {
+        "tags": ["Needs"],
+        "summary": "Memperbarui need via query id",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NeedRequest" } } }
+        },
+        "responses": { "200": { "description": "Need berhasil diperbarui" } }
+      },
+      "delete": {
+        "tags": ["Needs"],
+        "summary": "Menghapus need via query id",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "responses": { "200": { "description": "Need berhasil dihapus" } }
+      }
+    },
+    "/needs/{id}": {
+      "get": {
+        "tags": ["Needs"],
+        "summary": "Detail need",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Detail need berhasil diambil" }, "404": { "description": "Need tidak ditemukan" } }
+      },
+      "put": {
+        "tags": ["Needs"],
+        "summary": "Memperbarui need",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NeedRequest" } } }
+        },
+        "responses": { "200": { "description": "Need berhasil diperbarui" } }
+      },
+      "delete": {
+        "tags": ["Needs"],
+        "summary": "Menghapus need",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Need berhasil dihapus" } }
+      }
+    },
+    "/needs/{id}/matches": {
+      "get": {
+        "tags": ["Matching"],
+        "summary": "Rekomendasi offer untuk need tertentu",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "Rekomendasi match untuk need berhasil diambil" },
+          "404": { "description": "Need tidak ditemukan atau bukan milik Anda" }
+        }
+      }
+    },
+    "/offers": {
+      "get": {
+        "tags": ["Offers"],
+        "summary": "Daftar offer (atau detail bila id dikirim)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "query", "required": false, "schema": { "type": "integer" }, "example": 1 },
+          { "name": "user_id", "in": "query", "required": false, "schema": { "type": "integer" }, "example": 2 },
+          { "name": "search", "in": "query", "required": false, "schema": { "type": "string" }, "example": "API" }
+        ],
+        "responses": { "200": { "description": "Data offer berhasil diambil" } }
+      },
+      "post": {
+        "tags": ["Offers"],
+        "summary": "Membuat offer",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OfferRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "Offer berhasil dibuat" },
+          "403": { "description": "Batas offer paket tercapai" },
+          "422": { "description": "Validasi gagal" }
+        }
+      },
+      "put": {
+        "tags": ["Offers"],
+        "summary": "Memperbarui offer via query id",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OfferRequest" } } }
+        },
+        "responses": { "200": { "description": "Offer berhasil diperbarui" } }
+      },
+      "delete": {
+        "tags": ["Offers"],
+        "summary": "Menghapus offer via query id",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "responses": { "200": { "description": "Offer berhasil dihapus" } }
+      }
+    },
+    "/offers/{id}": {
+      "get": {
+        "tags": ["Offers"],
+        "summary": "Detail offer",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Detail offer berhasil diambil" }, "404": { "description": "Offer tidak ditemukan" } }
+      },
+      "put": {
+        "tags": ["Offers"],
+        "summary": "Memperbarui offer",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OfferRequest" } } }
+        },
+        "responses": { "200": { "description": "Offer berhasil diperbarui" } }
+      },
+      "delete": {
+        "tags": ["Offers"],
+        "summary": "Menghapus offer",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Offer berhasil dihapus" } }
+      }
+    },
+    "/offers/{id}/matches": {
+      "get": {
+        "tags": ["Matching"],
+        "summary": "Rekomendasi need untuk offer tertentu",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "Rekomendasi match untuk offer berhasil diambil" },
+          "404": { "description": "Offer tidak ditemukan atau bukan milik Anda" }
+        }
+      }
+    },
+    "/portfolios": {
+      "get": {
+        "tags": ["Portfolios"],
+        "summary": "Daftar portofolio (atau detail bila id dikirim)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "query", "required": false, "schema": { "type": "integer" }, "example": 1 },
+          { "name": "user_id", "in": "query", "required": false, "schema": { "type": "integer" }, "example": 2 }
+        ],
+        "responses": { "200": { "description": "Data portfolio berhasil diambil" } }
+      },
+      "post": {
+        "tags": ["Portfolios"],
+        "summary": "Menambahkan portofolio",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PortfolioRequest" } } }
+        },
+        "responses": { "201": { "description": "Portfolio berhasil ditambahkan" }, "422": { "description": "Validasi gagal" } }
+      }
+    },
+    "/portfolios/{id}": {
+      "get": {
+        "tags": ["Portfolios"],
+        "summary": "Detail portofolio",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Detail portfolio berhasil diambil" }, "404": { "description": "Portfolio tidak ditemukan" } }
+      },
+      "put": {
+        "tags": ["Portfolios"],
+        "summary": "Memperbarui portofolio",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PortfolioRequest" } } }
+        },
+        "responses": { "200": { "description": "Portfolio berhasil diperbarui" } }
+      },
+      "delete": {
+        "tags": ["Portfolios"],
+        "summary": "Menghapus portofolio",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Portfolio berhasil dihapus" } }
+      }
+    },
+    "/exchange-types": {
+      "get": {
+        "tags": ["Exchange Types"],
+        "summary": "Melihat jenis exchange",
+        "description": "Alias: `GET /exchange_types`. Tidak membutuhkan token.",
+        "responses": { "200": { "description": "Jenis exchange berhasil diambil" } }
+      }
+    },
+    "/matches": {
+      "get": {
+        "tags": ["Matching"],
+        "summary": "Rekomendasi match untuk user login",
+        "description": "Jika `offer_id` dikirim, mengembalikan match untuk offer tersebut. Jika `need_id` dikirim, untuk need tersebut. Jika keduanya kosong, mengembalikan match dua arah antar user.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "offer_id", "in": "query", "required": false, "schema": { "type": "integer" }, "example": 1 },
+          { "name": "need_id", "in": "query", "required": false, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": { "200": { "description": "Daftar match berhasil diambil" } }
+      }
+    },
+    "/exchange-requests": {
+      "get": {
+        "tags": ["Exchange Requests"],
+        "summary": "Daftar exchange request (atau detail bila id dikirim)",
+        "description": "Alias path: `/exchange_requests`. Mengembalikan request di mana user adalah pengirim atau penerima.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "query", "required": false, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": { "200": { "description": "Data exchange request berhasil diambil" } }
+      },
+      "post": {
+        "tags": ["Exchange Requests"],
+        "summary": "Mengirim exchange request",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ExchangeRequestCreate" },
+              "example": { "to_user_id": 2, "offer_id": 1, "need_id": 2, "message": "Halo, saya bisa bantu Laravel REST API dan butuh bantuan UI Design." }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Exchange request berhasil dikirim" },
+          "403": { "description": "Batas exchange request bulanan tercapai" },
+          "422": { "description": "Validasi gagal / mengirim ke diri sendiri" }
+        }
+      },
+      "patch": {
+        "tags": ["Exchange Requests"],
+        "summary": "Ubah status / konfirmasi selesai via query",
+        "description": "Gunakan `?id={id}` wajib. Jika `action=complete`, request dikonfirmasi selesai. Selain itu, body `status` digunakan untuk mengubah status.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 },
+          { "name": "action", "in": "query", "required": false, "schema": { "type": "string", "enum": ["status", "complete"] }, "example": "status" }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ExchangeStatusRequest" },
+              "example": { "status": "accepted" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Exchange request berhasil diperbarui" },
+          "403": { "description": "Aksi tidak diizinkan" },
+          "422": { "description": "Transisi status tidak valid" }
+        }
+      }
+    },
+    "/exchange-requests/{id}": {
+      "get": {
+        "tags": ["Exchange Requests"],
+        "summary": "Detail exchange request",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "Detail exchange request berhasil diambil" },
+          "404": { "description": "Tidak ditemukan atau bukan milik Anda" }
+        }
+      },
+      "patch": {
+        "tags": ["Exchange Requests"],
+        "summary": "Ubah status / konfirmasi selesai (path id)",
+        "description": "Gunakan `?action=complete` untuk konfirmasi selesai, atau kirim body `status` untuk mengubah status.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/PathId" },
+          { "name": "action", "in": "query", "required": false, "schema": { "type": "string", "enum": ["status", "complete"] } }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ExchangeStatusRequest" },
+              "example": { "status": "accepted" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Exchange request berhasil diperbarui" } }
+      }
+    },
+    "/exchange-requests/{id}/status": {
+      "patch": {
+        "tags": ["Exchange Requests"],
+        "summary": "Mengubah status exchange request",
+        "description": "accept/reject hanya boleh oleh penerima. in_progress hanya setelah accepted.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ExchangeStatusRequest" },
+              "example": { "status": "accepted" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Status exchange request berhasil diperbarui" },
+          "403": { "description": "Hanya penerima yang boleh accept/reject" },
+          "422": { "description": "Transisi status tidak valid" }
+        }
+      }
+    },
+    "/exchange-requests/{id}/complete": {
+      "patch": {
+        "tags": ["Exchange Requests"],
+        "summary": "Konfirmasi exchange selesai",
+        "description": "Exchange menjadi `completed` setelah kedua belah pihak mengonfirmasi.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "Konfirmasi selesai berhasil" },
+          "422": { "description": "Exchange belum bisa dikonfirmasi selesai" }
+        }
+      }
+    },
+    "/exchange-requests/{id}/progress": {
+      "get": {
+        "tags": ["Exchange Progress"],
+        "summary": "Daftar progress sebuah exchange request",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "Progress exchange berhasil diambil" },
+          "404": { "description": "Exchange request bukan milik Anda" }
+        }
+      },
+      "post": {
+        "tags": ["Exchange Progress"],
+        "summary": "Menambahkan progress pada exchange request",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProgressRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "Progress exchange berhasil ditambahkan" },
+          "422": { "description": "Validasi gagal" }
+        }
+      }
+    },
+    "/exchange-progress": {
+      "get": {
+        "tags": ["Exchange Progress"],
+        "summary": "Daftar progress berdasarkan query exchange_request_id",
+        "description": "Alias path: `/exchange_progress`.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "exchange_request_id", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": {
+          "200": { "description": "Progress exchange berhasil diambil" },
+          "400": { "description": "Parameter exchange_request_id wajib dikirim" }
+        }
+      },
+      "post": {
+        "tags": ["Exchange Progress"],
+        "summary": "Menambahkan progress via query exchange_request_id",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "exchange_request_id", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProgressRequest" } } }
+        },
+        "responses": { "201": { "description": "Progress exchange berhasil ditambahkan" } }
+      },
+      "put": {
+        "tags": ["Exchange Progress"],
+        "summary": "Memperbarui progress via query id",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProgressRequest" } } }
+        },
+        "responses": { "200": { "description": "Progress berhasil diperbarui" } }
+      },
+      "delete": {
+        "tags": ["Exchange Progress"],
+        "summary": "Menghapus progress via query id",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "responses": { "200": { "description": "Progress berhasil dihapus" } }
+      }
+    },
+    "/exchange-progress/{id}": {
+      "put": {
+        "tags": ["Exchange Progress"],
+        "summary": "Memperbarui progress",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProgressRequest" } } }
+        },
+        "responses": { "200": { "description": "Progress berhasil diperbarui" }, "404": { "description": "Bukan milik Anda" } }
+      },
+      "delete": {
+        "tags": ["Exchange Progress"],
+        "summary": "Menghapus progress",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Progress berhasil dihapus" } }
+      }
+    },
+    "/reviews": {
+      "get": {
+        "tags": ["Reviews"],
+        "summary": "Melihat review berdasarkan query user_id",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "user_id", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 2 }
+        ],
+        "responses": {
+          "200": { "description": "Review user berhasil diambil" },
+          "400": { "description": "Parameter user_id wajib dikirim" }
+        }
+      },
+      "post": {
+        "tags": ["Reviews"],
+        "summary": "Memberi review setelah exchange completed",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ReviewRequest" },
+              "example": { "exchange_request_id": 1, "reviewed_user_id": 2, "rating": 5, "comment": "Raka komunikatif dan desain UI-nya rapi." }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Review berhasil dikirim" },
+          "404": { "description": "Exchange completed tidak ditemukan atau bukan milik Anda" },
+          "409": { "description": "Anda sudah memberi review untuk exchange ini" },
+          "422": { "description": "User yang direview harus partner exchange" }
+        }
+      }
+    },
+    "/reputation": {
+      "get": {
+        "tags": ["Reputation"],
+        "summary": "Menghitung reputasi user login atau user lain",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "user_id", "in": "query", "required": false, "description": "Jika kosong, menghitung reputasi user login.", "schema": { "type": "integer" }, "example": 2 }
+        ],
+        "responses": {
+          "200": { "description": "Reputasi user berhasil dihitung" },
+          "404": { "description": "User tidak ditemukan" }
+        }
+      }
+    },
+    "/mentoring-rooms": {
+      "get": {
+        "tags": ["Mentoring Rooms"],
+        "summary": "Daftar ruang mentoring",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Daftar mentoring room" } }
+      },
+      "post": {
+        "tags": ["Mentoring Rooms"],
+        "summary": "Membuat ruang mentoring",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MentoringRoomRequest" } } }
+        },
+        "responses": { "201": { "description": "Mentoring room berhasil dibuat" }, "422": { "description": "Validasi gagal" } }
+      }
+    },
+    "/mentoring-rooms/{mentoringRoom}": {
+      "get": {
+        "tags": ["Mentoring Rooms"],
+        "summary": "Detail ruang mentoring",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "mentoringRoom", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "responses": { "200": { "description": "Detail mentoring room" }, "404": { "description": "Tidak ditemukan" } }
+      },
+      "put": {
+        "tags": ["Mentoring Rooms"],
+        "summary": "Memperbarui ruang mentoring (pemilik)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "mentoringRoom", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MentoringRoomUpdate" } } }
+        },
+        "responses": { "200": { "description": "Mentoring room berhasil diperbarui" }, "403": { "description": "Bukan pemilik" } }
+      },
+      "delete": {
+        "tags": ["Mentoring Rooms"],
+        "summary": "Menghapus ruang mentoring (pemilik)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "mentoringRoom", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "responses": { "204": { "description": "Mentoring room berhasil dihapus" }, "403": { "description": "Bukan pemilik" } }
+      }
+    },
+    "/mentoring-rooms/{mentoringRoom}/book": {
+      "post": {
+        "tags": ["Mentoring Bookings"],
+        "summary": "Booking sebuah ruang mentoring",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "mentoringRoom", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MentoringBookingRequest" } } }
+        },
+        "responses": { "201": { "description": "Booking berhasil dibuat (status pending)" } }
+      }
+    },
+    "/mentoring-bookings": {
+      "get": {
+        "tags": ["Mentoring Bookings"],
+        "summary": "Daftar booking (admin: semua, user: miliknya)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Daftar booking" } }
+      },
+      "post": {
+        "tags": ["Mentoring Bookings"],
+        "summary": "Membuat booking",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/MentoringBookingCreate" },
+              "example": { "mentoring_room_id": 1, "scheduled_at": "2026-07-01 19:00:00", "duration_minutes": 60, "notes": "Diskusi REST API" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Booking berhasil dibuat" }, "422": { "description": "Validasi gagal" } }
+      }
+    },
+    "/mentoring-bookings/{mentoringBooking}": {
+      "put": {
+        "tags": ["Mentoring Bookings"],
+        "summary": "Memperbarui booking (pemilik)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "mentoringBooking", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MentoringBookingUpdate" } } }
+        },
+        "responses": { "200": { "description": "Booking berhasil diperbarui" }, "403": { "description": "Bukan pemilik" } }
+      }
+    },
+    "/transactions": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Daftar transaksi (admin: semua, user: miliknya)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Data transaksi berhasil diambil" } }
+      },
+      "post": {
+        "tags": ["Transactions"],
+        "summary": "Membuat transaksi",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TransactionRequest" },
+              "example": { "type": "subscription", "reference_id": 2, "amount": 50000, "platform_fee": 0, "payment_method": "transfer" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Transaksi berhasil dibuat (status pending)" }, "422": { "description": "Validasi gagal" } }
+      }
+    },
+    "/transactions/{transaction}": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Detail transaksi (pemilik atau admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "transaction", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "responses": { "200": { "description": "Detail transaksi berhasil diambil" }, "404": { "description": "Bukan milik Anda" } }
+      }
+    },
+    "/transactions/{transaction}/confirm": {
+      "patch": {
+        "tags": ["Transactions"],
+        "summary": "Konfirmasi pembayaran transaksi",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "transaction", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }],
+        "responses": {
+          "200": { "description": "Transaksi berhasil dikonfirmasi" },
+          "404": { "description": "Bukan milik Anda" },
+          "422": { "description": "Transaksi sudah dikonfirmasi sebelumnya" }
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Daftar semua user",
+        "description": "Hanya untuk role admin.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Data semua user berhasil diambil" }, "403": { "description": "Akses ditolak. Hanya admin." } }
+      }
+    },
+    "/admin/exchanges": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Daftar semua exchange request",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Data semua exchange request berhasil diambil" }, "403": { "description": "Akses ditolak" } }
+      }
+    },
+    "/admin/reviews": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Daftar semua review (termasuk yang disembunyikan)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Data semua review berhasil diambil" }, "403": { "description": "Akses ditolak" } }
+      }
+    },
+    "/admin/transactions": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Daftar semua transaksi",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Data semua transaksi berhasil diambil" }, "403": { "description": "Akses ditolak" } }
+      }
+    },
+    "/admin/users/{id}/verify": {
+      "patch": {
+        "tags": ["Admin"],
+        "summary": "Memverifikasi user",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "User berhasil diverifikasi" },
+          "403": { "description": "Akses ditolak" },
+          "404": { "description": "User tidak ditemukan" }
+        }
+      }
+    },
+    "/admin/reviews/{id}/hide": {
+      "patch": {
+        "tags": ["Admin"],
+        "summary": "Menyembunyikan review",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "Review berhasil disembunyikan" },
+          "403": { "description": "Akses ditolak" },
+          "404": { "description": "Review tidak ditemukan" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Token",
+        "description": "Bearer Token Laravel Sanctum. Token contoh: fakhri-token-123"
+      }
+    },
+    "parameters": {
+      "PathId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "integer" },
+        "example": 1
+      }
+    },
+    "schemas": {
+      "ApiEnvelope": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "boolean", "example": true },
+          "message": { "type": "string", "example": "Berhasil" },
+          "data": { "nullable": true }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": { "type": "string", "maxLength": 100, "example": "Dina" },
+          "email": { "type": "string", "format": "email", "maxLength": 120, "example": "dina@example.com" },
+          "password": { "type": "string", "minLength": 8, "example": "password123" }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email", "example": "fakhri@example.com" },
+          "password": { "type": "string", "example": "password123" }
+        }
+      },
+      "SubscribeRequest": {
+        "type": "object",
+        "required": ["plan_id"],
+        "properties": {
+          "plan_id": { "type": "integer", "description": "Harus ada di tabel plans.", "example": 2 }
+        }
+      },
+      "ProfileRequest": {
+        "type": "object",
+        "required": ["bio", "location", "work_mode", "available_time"],
+        "properties": {
+          "bio": { "type": "string", "example": "Backend learner yang bisa membantu membuat REST API Laravel." },
+          "location": { "type": "string", "maxLength": 120, "example": "Purwokerto" },
+          "work_mode": { "type": "string", "enum": ["online", "offline", "hybrid"], "example": "online" },
+          "available_time": { "type": "string", "maxLength": 120, "example": "Malam dan akhir pekan" },
+          "portfolio_url": { "type": "string", "format": "uri", "maxLength": 255, "nullable": true, "example": "https://portfolio.example.com/fakhri" },
+          "social_url": { "type": "string", "format": "uri", "maxLength": 255, "nullable": true, "example": "https://linkedin.com/in/fakhri" }
+        }
+      },
+      "SkillRequest": {
+        "type": "object",
+        "required": ["name", "category", "level"],
+        "properties": {
+          "name": { "type": "string", "maxLength": 120, "example": "Laravel REST API" },
+          "category": { "type": "string", "maxLength": 100, "example": "Programming" },
+          "level": { "type": "string", "enum": ["beginner", "intermediate", "advanced"], "example": "intermediate" }
+        }
+      },
+      "NeedRequest": {
+        "type": "object",
+        "required": ["title", "category", "description", "exchange_offer"],
+        "properties": {
+          "title": { "type": "string", "maxLength": 180, "example": "Butuh bantuan desain UI dashboard" },
+          "category": { "type": "string", "maxLength": 100, "example": "Design" },
+          "description": { "type": "string", "example": "Saya membutuhkan desain dashboard untuk aplikasi REST API." },
+          "exchange_offer": { "type": "string", "example": "Saya bisa membantu membuat endpoint CRUD dan dokumentasi API." }
+        }
+      },
+      "OfferRequest": {
+        "type": "object",
+        "required": ["title", "type", "category", "description", "exchange_expectation"],
+        "properties": {
+          "title": { "type": "string", "maxLength": 180, "example": "Saya bisa bantu membuat REST API Laravel" },
+          "type": { "type": "string", "enum": ["skill", "time", "experience", "mentoring", "project", "collaboration"], "example": "skill" },
+          "category": { "type": "string", "maxLength": 100, "example": "Programming" },
+          "description": { "type": "string", "example": "Saya bisa membantu API login, CRUD, dan dokumentasi." },
+          "exchange_expectation": { "type": "string", "example": "Saya membutuhkan bantuan desain UI dashboard." },
+          "available_duration": { "type": "string", "maxLength": 120, "nullable": true, "example": "4 jam per minggu" }
+        }
+      },
+      "PortfolioRequest": {
+        "type": "object",
+        "required": ["title", "description"],
+        "properties": {
+          "title": { "type": "string", "maxLength": 160, "example": "Dashboard Analitik Penjualan" },
+          "description": { "type": "string", "example": "Membuat dashboard analitik memakai Laravel dan Chart.js." },
+          "file_url": { "type": "string", "format": "uri", "maxLength": 255, "nullable": true, "example": "https://drive.google.com/file/portfolio" },
+          "project_url": { "type": "string", "format": "uri", "maxLength": 255, "nullable": true, "example": "https://github.com/fakhri/dashboard" }
+        }
+      },
+      "ExchangeRequestCreate": {
+        "type": "object",
+        "required": ["to_user_id", "offer_id", "need_id", "message"],
+        "properties": {
+          "to_user_id": { "type": "integer", "description": "Harus ada di tabel users dan bukan diri sendiri.", "example": 2 },
+          "offer_id": { "type": "integer", "example": 1 },
+          "need_id": { "type": "integer", "example": 2 },
+          "message": { "type": "string", "example": "Halo, saya bisa bantu Laravel REST API dan butuh bantuan UI Design." }
+        }
+      },
+      "ExchangeStatusRequest": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": { "type": "string", "enum": ["accepted", "rejected", "in_progress", "cancelled"], "example": "accepted" }
+        }
+      },
+      "ProgressRequest": {
+        "type": "object",
+        "required": ["progress_note"],
+        "properties": {
+          "progress_note": { "type": "string", "example": "Endpoint login dan CRUD offer sudah selesai." },
+          "file_url": { "type": "string", "format": "uri", "maxLength": 255, "nullable": true, "example": "https://drive.google.com/file/progress" }
+        }
+      },
+      "ReviewRequest": {
+        "type": "object",
+        "required": ["exchange_request_id", "reviewed_user_id", "rating", "comment"],
+        "properties": {
+          "exchange_request_id": { "type": "integer", "description": "Exchange harus berstatus completed/reviewed.", "example": 1 },
+          "reviewed_user_id": { "type": "integer", "description": "Harus partner exchange.", "example": 2 },
+          "rating": { "type": "integer", "minimum": 1, "maximum": 5, "example": 5 },
+          "comment": { "type": "string", "example": "Raka komunikatif dan desain UI-nya rapi." }
+        }
+      },
+      "MentoringRoomRequest": {
+        "type": "object",
+        "required": ["title", "scheduled_at"],
+        "properties": {
+          "title": { "type": "string", "maxLength": 191, "example": "Kelas Mentoring Laravel API" },
+          "description": { "type": "string", "nullable": true, "example": "Belajar membangun REST API dari nol." },
+          "mentor_id": { "type": "integer", "nullable": true, "example": 1 },
+          "scheduled_at": { "type": "string", "format": "date-time", "example": "2026-07-01 19:00:00" },
+          "duration_minutes": { "type": "integer", "nullable": true, "example": 90 },
+          "price": { "type": "number", "nullable": true, "example": 75000 }
+        }
+      },
+      "MentoringRoomUpdate": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "maxLength": 191 },
+          "description": { "type": "string", "nullable": true },
+          "scheduled_at": { "type": "string", "format": "date-time" },
+          "duration_minutes": { "type": "integer" },
+          "price": { "type": "number" },
+          "status": { "type": "string", "example": "open" }
+        }
+      },
+      "MentoringBookingRequest": {
+        "type": "object",
+        "required": ["scheduled_at"],
+        "properties": {
+          "scheduled_at": { "type": "string", "format": "date-time", "example": "2026-07-01 19:00:00" },
+          "duration_minutes": { "type": "integer", "nullable": true, "example": 60 },
+          "notes": { "type": "string", "nullable": true, "example": "Diskusi REST API" }
+        }
+      },
+      "MentoringBookingCreate": {
+        "type": "object",
+        "required": ["mentoring_room_id", "scheduled_at"],
+        "properties": {
+          "mentoring_room_id": { "type": "integer", "example": 1 },
+          "scheduled_at": { "type": "string", "format": "date-time", "example": "2026-07-01 19:00:00" },
+          "duration_minutes": { "type": "integer", "nullable": true, "example": 60 },
+          "notes": { "type": "string", "nullable": true, "example": "Diskusi REST API" }
+        }
+      },
+      "MentoringBookingUpdate": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "approved" },
+          "scheduled_at": { "type": "string", "format": "date-time" },
+          "duration_minutes": { "type": "integer" }
+        }
+      },
+      "TransactionRequest": {
+        "type": "object",
+        "required": ["type", "amount"],
+        "properties": {
+          "type": { "type": "string", "maxLength": 30, "example": "subscription" },
+          "reference_id": { "type": "integer", "nullable": true, "example": 2 },
+          "amount": { "type": "integer", "minimum": 0, "example": 50000 },
+          "platform_fee": { "type": "integer", "minimum": 0, "nullable": true, "example": 0 },
+          "payment_method": { "type": "string", "maxLength": 80, "nullable": true, "example": "transfer" }
+        }
+      }
+    }
+  }
+}
