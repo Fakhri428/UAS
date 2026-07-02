@@ -170,3 +170,25 @@ php artisan test
 npm run build
 php artisan route:list --path=api
 ```
+
+
+Tampilan
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/28fec556-8a53-4ad2-bbec-c6480ada41bd" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/770cf948-52e5-4fe3-818a-16efd3272941" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a682e63e-b0f5-4ea7-a814-1eb2ce8eb633" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e0a46ea7-5f43-4ecf-8551-387bd31014bb" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/50788f4e-dda8-452a-ad9b-c162276f4f03" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/191bfe1c-a35c-4a71-8c8d-ff0123db72fb" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3386696f-a562-41ac-9413-69cf4d3a3b8a" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1526e227-c3ab-4737-8e58-a4176c81d1da" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/9547c3b1-547a-4487-9fc7-851cbaacf1ff" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1498e1c1-147f-4207-a686-0e7f192813a8" />
+
+
+
+
+
+
+
+
+
